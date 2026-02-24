@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from app.models.user import User
 
 api = Namespace('users', description='User operations')
 
@@ -20,7 +21,6 @@ class UserList(Resource):
     def post(self):
         """Register a new user"""
         user_data = api.payload
-        print("toto")
         # Simulate email uniqueness check (to be replaced by real validation with persistence)
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
@@ -28,6 +28,11 @@ class UserList(Resource):
 
         new_user = facade.create_user(user_data)
         return {'id': new_user.id, 'first_name': new_user.first_name, 'last_name': new_user.last_name, 'email': new_user.email}, 201
+
+    def get(self):
+        """List all users (List to dict)"""
+        users = facade.get_all_users()
+        return [{'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email} for user in users], 200
 
     @api.route('/<user_id>')
     class UserResource(Resource):
@@ -39,3 +44,16 @@ class UserList(Resource):
             if not user:
                 return {'error': 'User not found'}, 404
             return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
+
+        def put(self, user_id):
+            """Update user details by ID (to be implemented in later tasks)"""
+            if not facade.get_user(user_id):
+                return {'error': 'User not found'}, 404
+
+            data = api.payload
+            if not data:
+                return {'error': 'No input data is invalid'}, 400
+            updated_user = facade.update_user(user_id, data)
+            if not updated_user:
+                return {'error': 'User not found'}, 404
+            return {'id': updated_user['id'], 'first_name': updated_user['first_name'], 'last_name': updated_user['last_name'], 'email': updated_user['email']}, 200
