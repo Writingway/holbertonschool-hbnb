@@ -63,6 +63,40 @@ class HBnBFacade:
         self.amenity_repo.update(amenity_id, new_amenity)
         return new_amenity
 
+    # Place Operations
+    def create_place(self, place_data):
+        owner = self.get_user(place_data.get('owner_id'))
+        if not owner:
+            return {"error": "Owner not found"}, 404
+
+        place = Place(
+            title=place_data["title"],
+            description=place_data["description"],
+            price=place_data["price"],
+            latitude=place_data["latitude"],
+            longitude=place_data["longitude"],
+            owner=owner
+        )
+
+        place.amenities = place_data.get('amenities', [])
+
+        self.place_repo.add(place)
+        return place
+
+    def get_place(self, place_id):
+        return self.place_repo.get(place_id)
+
+    def get_all_places(self):
+        return self.place_repo.get_all()
+
+    def update_place(self, place_id, data):
+        place = self.place_repo.get(place_id)
+        if not place:
+            return {"error": "Place not found"}, 404
+
+        place.update(data)
+        return place
+
 
 # Initialize the facade instance to be used across the application
 facade = HBnBFacade()
