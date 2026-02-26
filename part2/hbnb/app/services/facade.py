@@ -22,7 +22,7 @@ class HBnBFacade:
         return self.user_repo.get(user_id)
 
     def get_user_by_email(self, email):
-        return self.user_repo.get_by_attribute('email', email)
+        return self.user_repo.get_by_attribute("email", email)
 
     def get_all_users(self):
         return self.user_repo.get_all()
@@ -35,7 +35,7 @@ class HBnBFacade:
             "id": user_id,
             "first_name": new_data.get("first_name"),
             "last_name": new_data.get("last_name"),
-            "email": new_data.get("email")
+            "email": new_data.get("email"),
         }
         self.user_repo.update(user_id, new_user)
         return new_user
@@ -56,16 +56,13 @@ class HBnBFacade:
         amenity = self.get_amenity(amenity_id)
         if not amenity:
             return None
-        new_amenity = {
-            "id": amenity_id,
-            "name": amenity_data.get("name")
-        }
+        new_amenity = {"id": amenity_id, "name": amenity_data.get("name")}
         self.amenity_repo.update(amenity_id, new_amenity)
         return new_amenity
 
     # Place Operations
     def create_place(self, place_data):
-        owner = self.get_user(place_data.get('owner_id'))
+        owner = self.get_user(place_data.get("owner_id"))
         if not owner:
             return {"error": "Owner not found"}, 404
 
@@ -75,10 +72,10 @@ class HBnBFacade:
             price=place_data["price"],
             latitude=place_data["latitude"],
             longitude=place_data["longitude"],
-            owner=owner
+            owner=owner,
         )
 
-        place.amenities = place_data.get('amenities', [])
+        place.amenities = place_data.get("amenities", [])
 
         self.place_repo.add(place)
         return place
@@ -96,7 +93,3 @@ class HBnBFacade:
 
         place.update(data)
         return place
-
-
-# Initialize the facade instance to be used across the application
-facade = HBnBFacade()
