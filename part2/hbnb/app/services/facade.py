@@ -97,6 +97,41 @@ class HBnBFacade:
         place.update(data)
         return place
 
+    def create_review(self, review_data):
+        review = Review(**review_data)
+        if not review_data["place_id"]:
+            raise ValueError("Place not found")
+        if not review_data["user_id"]:
+            raise ValueError("User not found")
+        if not review_data["rating"]:
+            raise ValueError("Rating not found") 
+        self.review_repo.add(review)
+        return review
 
-# Initialize the facade instance to be used across the application
-facade = HBnBFacade()
+    def get_review(self, review_id):
+        return self.review_repo.get(review_id)
+
+    def get_all_reviews(self):
+        return self.review_repo.get_all()
+
+    def get_reviews_by_place(self, place_id):
+        all_reviews = self.get_all_reviews
+        return [review for review in all_reviews if review.place_id is place_id]
+
+    def update_review(self, review_id, review_data):
+        review = self.get_review(review_id)
+        if not review:
+            return None
+        new_review = {
+            "id": review_id,
+            "text": review_data.get("text"),
+            "rating": review_data.get("rating"),
+            "user_id": review_data.get("user_id"),
+            "place_id": review_data.get("place_id")
+            }
+        self.review_repo.update(review_id, new_review)
+        return new_review
+
+    def delete_review(self, review_id):
+        self.review_repo.delete(review_id)
+
