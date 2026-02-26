@@ -11,6 +11,11 @@ review_model = api.model('Review', {
     'place_id': fields.String(required=True, description='ID of the place')
 })
 
+put_model = api.model('Review', {
+    'text': fields.String(required=True, description='Text of the review'),
+    'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
+})
+
 @api.route('/')
 class ReviewList(Resource):
     @api.expect(review_model)
@@ -47,12 +52,18 @@ class ReviewResource(Resource):
     @api.response(404, 'Review not found')
     def get(self, review_id):
         """Get review details by ID"""
-        review = facade.get_amenity(review_id)
+        review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
-        return {'id': review.id, 'name': review.name}, 200
+        return {
+            'id': review.id,
+            'text': review.text,
+            'rating': review.rating,
+            'user_id': review.user_id,
+            'place_id': review.place_id
+        }, 200
 
-    @api.expect(review_model)
+    @api.expect(put_model)
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
