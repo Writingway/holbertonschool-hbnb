@@ -7,8 +7,8 @@ class Place(BaseModel):
         super().__init__()
 
         self.title = self._validate_field("title", title, str, 100, True)
-        self.description = self._validate_field("description", description, str, None, True)
-        self.price = self._validate_field("price", price, float, None, True, min_value=0)
+        self.description = self._validate_field("description", description, str, None, False)
+        self.price = self._validate_field("price", price, float, None, True, min_value=0.01)
         self.latitude = self._validate_field("latitude", latitude, float, None, True, min_value=-90, max_value=90)
         self.longitude = self._validate_field("longitude", longitude, float, None, True, min_value=-180, max_value=180)
         self.owner = self._validate_field("owner", owner, expected_type=User, required=True)

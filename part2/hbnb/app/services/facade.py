@@ -64,11 +64,11 @@ class HBnBFacade:
     def create_place(self, place_data):
         owner = self.get_user(place_data.get("owner_id"))
         if not owner:
-            return {"error": "Owner not found"}, 404
+            raise ValueError("Owner not found")
 
         place = Place(
             title=place_data["title"],
-            description=place_data["description"],
+            description=place_data.get("description", ""),
             price=place_data["price"],
             latitude=place_data["latitude"],
             longitude=place_data["longitude"],
@@ -89,7 +89,7 @@ class HBnBFacade:
     def update_place(self, place_id, data):
         place = self.place_repo.get(place_id)
         if not place:
-            return {"error": "Place not found"}, 404
+            return None
 
         place.update(data)
         return place
@@ -97,12 +97,12 @@ class HBnBFacade:
     def create_review(self, review_data):
         user = self.get_user(review_data.get("user_id"))
         place = self.get_place(review_data.get("place_id"))
-        if not review_data.get("place_id"):
-            raise ValueError("Place not found")
-        if not review_data.get("user_id"):
+        if not user:
             raise ValueError("User not found")
+        if not place:
+            raise ValueError("Place not found")
         if not review_data.get("rating"):
-            raise ValueError("Rating not found")
+            raise ValueError("Rating is required")
         review = Review(
             text=review_data.get("text"),
             rating=review_data.get("rating"),
