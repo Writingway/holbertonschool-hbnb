@@ -22,7 +22,7 @@ class HBnBFacade:
         return self.user_repo.get(user_id)
 
     def get_user_by_email(self, email):
-        return self.user_repo.get_by_attribute('email', email)
+        return self.user_repo.get_by_attribute("email", email)
 
     def get_all_users(self):
         return self.user_repo.get_all()
@@ -35,7 +35,7 @@ class HBnBFacade:
             "id": user_id,
             "first_name": new_data.get("first_name"),
             "last_name": new_data.get("last_name"),
-            "email": new_data.get("email")
+            "email": new_data.get("email"),
         }
         self.user_repo.update(user_id, new_user)
         return new_user
@@ -56,29 +56,26 @@ class HBnBFacade:
         amenity = self.get_amenity(amenity_id)
         if not amenity:
             return None
-        new_amenity = {
-            "id": amenity_id,
-            "name": amenity_data.get("name")
-        }
+        new_amenity = {"id": amenity_id, "name": amenity_data.get("name")}
         self.amenity_repo.update(amenity_id, new_amenity)
         return new_amenity
 
     # Place Operations
     def create_place(self, place_data):
-        owner = self.get_user(place_data.get('owner_id'))
+        owner = self.get_user(place_data.get("owner_id"))
         if not owner:
-            return {"error": "Owner not found"}, 404
+            raise ValueError("Owner not found")
 
         place = Place(
             title=place_data["title"],
-            description=place_data["description"],
+            description=place_data.get("description", ""),
             price=place_data["price"],
             latitude=place_data["latitude"],
             longitude=place_data["longitude"],
-            owner=owner
+            owner=owner,
         )
 
-        place.amenities = place_data.get('amenities', [])
+        place.amenities = place_data.get("amenities", [])
 
         self.place_repo.add(place)
         return place
@@ -92,7 +89,7 @@ class HBnBFacade:
     def update_place(self, place_id, data):
         place = self.place_repo.get(place_id)
         if not place:
-            return {"error": "Place not found"}, 404
+            return None
 
         place.update(data)
         return place
@@ -100,12 +97,12 @@ class HBnBFacade:
     def create_review(self, review_data):
         user = self.get_user(review_data.get("user_id"))
         place = self.get_place(review_data.get("place_id"))
-        if not review_data.get("place_id"):
-            raise ValueError("Place not found")
-        if not review_data.get("user_id"):
+        if not user:
             raise ValueError("User not found")
+        if not place:
+            raise ValueError("Place not found")
         if not review_data.get("rating"):
-            raise ValueError("Rating not found")
+            raise ValueError("Rating is required")
         review = Review(
             text=review_data.get("text"),
             rating=review_data.get("rating"),
@@ -141,4 +138,3 @@ class HBnBFacade:
 
     def delete_review(self, review_id):
         self.review_repo.delete(review_id)
-
