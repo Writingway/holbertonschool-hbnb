@@ -11,10 +11,11 @@ review_model = api.model('Review', {
     'place_id': fields.String(required=True, description='ID of the place')
 })
 
-put_model = api.model('Review', {
+put_model = api.model('PUT_Review', {
     'text': fields.String(required=True, description='Text of the review'),
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
 })
+
 
 @api.route('/')
 class ReviewList(Resource):
@@ -48,6 +49,7 @@ class ReviewList(Resource):
                 'user_id': review.user_id,
                 'place_id': review.place_id
             } for review in reviews], 200
+
 
 @api.route('/<review_id>')
 class ReviewResource(Resource):

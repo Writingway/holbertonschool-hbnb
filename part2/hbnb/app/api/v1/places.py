@@ -33,8 +33,13 @@ place_model = api.model('Place', {
     'longitude': fields.Float(required=True, description='Longitude of the place'),
     'owner_id': fields.String(required=True, description='ID of the owner'),
     'owner': fields.Nested(user_model, description='Owner of the place'),
-    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's"),
-    'reviews': fields.List(fields.Nested(review_model), description='List of reviews')
+    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
+})
+
+put_place_model = api.model('PUT_Place', {
+    'title': fields.String(required=True, description='Title of the place'),
+    'description': fields.String(description='Description of the place'),
+    'price': fields.Float(required=True, description='Price per night'),
 })
 
 
@@ -114,39 +119,28 @@ class PlaceResource(Resource):
             ]
         }, 200
 
-    @api.expect(place_model)
+    @api.expect(put_place_model)
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
-        place_data = api.payload
+        try:
+            place_data = api.payload
+            updated_place = facade.update_place(place_id, place_data)
+            if not updated_place:
+                return {"error": "Place not found"}, 404
+            if len(updated_place.title) == 0:
+                return {"error": "Place title is empty"}, 400
+            if len(updated_place.description) == 0:
+                return {"error": "Place description is empty"}, 400
+            if updated_place.price <= 0:
+                return {"error": "Place price must be greater than zero"}, 400
 
-        updated_place = facade.update_place(place_id, place_data)
-        if not updated_place:
-            return {"error": "Place not found"}, 404
+            return {"message": "Place updated successfully"}, 200
+        except (ValueError, TypeError, KeyError) as e:
+            return {'error': str(e)}, 400
 
-        return {
-            "id": updated_place.id,
-            "title": updated_place.title,
-            "description": updated_place.description,
-            "price": updated_place.price,
-            "latitude": updated_place.latitude,
-            "longitude": updated_place.longitude,
-            "owner_id": {
-                "id": updated_place.owner.id,
-                "first_name": updated_place.owner.first_name,
-                "last_name": updated_place.owner.last_name,
-                "email": updated_place.owner.email
-            },
-            "amenities": [
-                {
-                    "id": amenity_id,
-                    "name": facade.get_amenity(amenity_id).name
-                }
-                for amenity_id in updated_place.amenities
-            ]
-        }, 200
 
 @api.route('/<place_id>/reviews')
 class PlaceReviewList(Resource):
@@ -170,4 +164,3 @@ class PlaceReviewList(Resource):
             }
             for review in reviews
         ], 200
-
