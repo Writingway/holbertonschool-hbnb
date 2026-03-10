@@ -28,7 +28,12 @@ class UserList(Resource):
                 return {'error': 'Email already registered'}, 400
 
             new_user = facade.create_user(user_data)
-            return {'id': new_user.id, 'first_name': new_user.first_name, 'last_name': new_user.last_name, 'email': new_user.email}, 201
+            return {
+                'id': new_user.id,
+                'first_name': new_user.first_name,
+                'last_name': new_user.last_name,
+                'email': new_user.email
+            }, 201
         except (ValueError, TypeError, KeyError) as e:
             return {'error': str(e)}, 400
 
@@ -37,10 +42,11 @@ class UserList(Resource):
         users = facade.get_all_users()
         return [
             {
-                'id': user.id, 
+                'id': user.id,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
-                'email': user.email
+                'email': user.email,
+                'is_admin': user.is_admin
             } for user in users], 200
 
 
@@ -57,7 +63,8 @@ class UserResource(Resource):
             'id': user.id,
             'first_name': user.first_name,
             'last_name': user.last_name,
-            'email': user.email
+            'email': user.email,
+            'is_admin': user.is_admin
         }, 200
 
     @api.expect(user_model)
