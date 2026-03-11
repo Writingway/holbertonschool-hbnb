@@ -1,6 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.user import User
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 api = Namespace('users', description='User operations')
 
@@ -8,6 +9,7 @@ api = Namespace('users', description='User operations')
 user_model = api.model('User', {
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
+    'password': fields.String(required=True, description='Password for the user'),
     'email': fields.String(required=True, description='Email of the user')
 })
 
@@ -26,6 +28,11 @@ class UserList(Resource):
             existing_user = facade.get_user_by_email(user_data['email'])
             if existing_user:
                 return {'error': 'Email already registered'}, 400
+
+            print(user_data["password"])
+            User.hash_password(self, user_data["password"])
+            user_data["password"] = self.password
+            print(user_data["password"])
 
             new_user = facade.create_user(user_data)
             return {
@@ -68,17 +75,26 @@ class UserResource(Resource):
         }, 200
 
     @api.expect(user_model)
+    @jwt_required()
     def put(self, user_id):
         """Update user details by ID (to be implemented in later tasks)"""
         if not facade.get_user(user_id):
             return {'error': 'User not found'}, 404
 
         data = api.payload
+        current_user = get_jwt_identity()
         if not data:
             return {'error': 'No input data is invalid'}, 400
+        if current_user != user_id:
+            return {'error': 'Unauthorized action'}, 403
+        # Prevent the user from modifying their email and password in this endpoint.
+        if 'email' in data or 'password' in data:
+            return {'error': 'You cannot modify email or password.'}, 400
+
         updated_user = facade.update_user(user_id, data)
         if not updated_user:
             return {'error': 'User not found'}, 404
+
         return {
             'id': updated_user['id'],
             'first_name': updated_user['first_name'],
