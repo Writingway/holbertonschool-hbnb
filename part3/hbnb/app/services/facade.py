@@ -69,7 +69,7 @@ class HBnBFacade:
         place = Place(
             title=place_data["title"],
             description=place_data.get("description", ""),
-            price=place_data["price"], 
+            price=place_data["price"],
             latitude=place_data["latitude"],
             longitude=place_data["longitude"],
             owner=owner,
@@ -93,8 +93,8 @@ class HBnBFacade:
 
         place.update(data)
         return place
-
-    # Review operations
+    
+    # Review Operations
     def create_review(self, review_data):
         user = self.get_user(review_data.get("user_id"))
         place = self.get_place(review_data.get("place_id"))
