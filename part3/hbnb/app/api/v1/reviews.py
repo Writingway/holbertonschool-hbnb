@@ -33,7 +33,7 @@ class ReviewList(Resource):
             place = facade.get_place(review_data['place_id'])
             if not place:
                 return {'error': 'Place not found'}, 404
-            if place.owner.id == current_user:
+            if place.owner_id == current_user:
                 return {'error': 'You cannot review your own place'}, 400
             # Check that the user has not already reviewed this place.
             review_by_id = facade.get_reviews_by_place(review_data['place_id'])
