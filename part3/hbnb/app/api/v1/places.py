@@ -102,6 +102,7 @@ class PlaceResource(Resource):
             "price": place.price,
             "latitude": place.latitude,
             "longitude": place.longitude,
+            # TODO: Expected Responses is not the same about docs github
             "owner": {
                 "id": place.owner.id,
                 "first_name": place.owner.first_name,

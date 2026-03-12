@@ -1,11 +1,19 @@
 from app.models.base_model import BaseModel
 from app import bcrypt
+from app import db
 
 
 class User(BaseModel):
+    __tablename__ = 'users'
+
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
     def __init__(self, first_name, last_name, email, password, is_admin=False):
         super().__init__()
-
         self.first_name = self._validate_field("first_name", first_name, str, 50, True)
         self.last_name = self._validate_field("last_name", last_name, str, 50, True)
         self.email = self._validate_field("email", email, str, 100, True, fmt='email')
