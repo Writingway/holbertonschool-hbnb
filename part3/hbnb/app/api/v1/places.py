@@ -66,7 +66,7 @@ class PlaceList(Resource):
                 'price': new_place.price,
                 'latitude': new_place.latitude,
                 'longitude': new_place.longitude,
-                'owner_id': new_place.owner.id
+                'owner_id': new_place.owner_id
             }, 201
         except (ValueError, TypeError, KeyError) as e:
             return {'error': str(e)}, 400
@@ -81,7 +81,7 @@ class PlaceList(Resource):
             "title": place.title,
             "latitude": place.latitude,
             "longitude": place.longitude,
-            "owner_id": place.owner.id
+            "owner_id": place.owner_id
         } for place in places], 200
 
 
@@ -95,6 +95,10 @@ class PlaceResource(Resource):
         if not place:
             return {"error": "Place not found"}, 404
 
+        owner = facade.get_user(place.owner_id)
+        if not owner:
+            return {"error": "Owner not found"}, 404
+
         return {
             "id": place.id,
             "title": place.title,
@@ -104,10 +108,10 @@ class PlaceResource(Resource):
             "longitude": place.longitude,
             # TODO: Expected Responses is not the same about docs github
             "owner": {
-                "id": place.owner.id,
-                "first_name": place.owner.first_name,
-                "last_name": place.owner.last_name,
-                "email": place.owner.email
+                "id": owner.id,
+                "first_name": owner.first_name,
+                "last_name": owner.last_name,
+                "email": owner.email
             },
             "amenities": [
                 {
@@ -141,7 +145,7 @@ class PlaceResource(Resource):
                 return {"error": "Place not found"}, 404
             # Show the data of place
 
-            if place.owner.id != current_user:
+            if place.owner_id != current_user:
                 return {"error": "Unauthorized action."}, 403
 
             updated_place = facade.update_place(place_id, place_data)

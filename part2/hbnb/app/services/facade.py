@@ -69,7 +69,7 @@ class HBnBFacade:
         place = Place(
             title=place_data["title"],
             description=place_data.get("description", ""),
-            price=place_data["price"], 
+            price=place_data["price"],
             latitude=place_data["latitude"],
             longitude=place_data["longitude"],
             owner=owner,

@@ -11,7 +11,7 @@ class Place(BaseModel):
     price = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
-    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    owner_id = db.Column(db.String(50), db.ForeignKey('users.id'), nullable=False)
     # TODO: Do not include relationships
     # amenities = db.Column(db.PickleType, default=[])
     # reviews = db.Column(db.PickleType, default=[])
@@ -24,7 +24,8 @@ class Place(BaseModel):
         self.price = self._validate_field("price", price, float, None, True, min_value=0.01)
         self.latitude = self._validate_field("latitude", latitude, float, None, True, min_value=-90, max_value=90)
         self.longitude = self._validate_field("longitude", longitude, float, None, True, min_value=-180, max_value=180)
-        self.owner = self._validate_field("owner", owner, expected_type=User, required=True)
+        owner = self._validate_field("owner", owner, expected_type=User, required=True)
+        self.owner_id = owner.id
         self.amenities = []  # List of amenity IDs
         self.reviews = []    # List of review
 
@@ -47,7 +48,7 @@ class Place(BaseModel):
             "price": self.price,
             "latitude": self.latitude,
             "longitude": self.longitude,
-            "owner": self.owner,
+            "owner_id": self.owner_id,
             "amenities": self.amenities,
             "reviews": self.reviews
         }
