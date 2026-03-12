@@ -1,20 +1,24 @@
-from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
 from app.models.amenity import Amenity
+from app.services.repositories.user_repository import UserRepository
+from app.services.repositories.place_repository import PlaceRepository
+from app.services.repositories.review_repository import ReviewRepository
+from app.services.repositories.amenity_repository import AmenityRepository
 
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
+        self.user_repo = UserRepository()
+        self.place_repo = PlaceRepository()
+        self.review_repo = ReviewRepository()
+        self.amenity_repo = AmenityRepository()
 
     # User operations
     def create_user(self, user_data):
         user = User(**user_data)
+        user.hash_password(user_data["password"])
         self.user_repo.add(user)
         return user
 
@@ -22,7 +26,7 @@ class HBnBFacade:
         return self.user_repo.get(user_id)
 
     def get_user_by_email(self, email):
-        return self.user_repo.get_by_attribute("email", email)
+        return self.user_repo.get_user_by_email(email)
 
     def get_all_users(self):
         return self.user_repo.get_all()
@@ -33,32 +37,12 @@ class HBnBFacade:
             return None
         new_user = {
             "id": user_id,
-            "first_name": new_data.get("first_name"),
-            "last_name": new_data.get("last_name"),
-            "email": new_data.get("email"),
+            "first_name": new_data.get("first_name") or user.first_name,
+            "last_name": new_data.get("last_name") or user.last_name,
+            "email": new_data.get("email") or user.email,
         }
         self.user_repo.update(user_id, new_user)
         return new_user
-
-    # Amenity operations
-    def create_amenity(self, amenity_data):
-        amenity = Amenity(**amenity_data)
-        self.amenity_repo.add(amenity)
-        return amenity
-
-    def get_amenity(self, amenity_id):
-        return self.amenity_repo.get(amenity_id)
-
-    def get_all_amenities(self):
-        return self.amenity_repo.get_all()
-
-    def update_amenity(self, amenity_id, amenity_data):
-        amenity = self.get_amenity(amenity_id)
-        if not amenity:
-            return None
-        new_amenity = {"id": amenity_id, "name": amenity_data.get("name")}
-        self.amenity_repo.update(amenity_id, new_amenity)
-        return new_amenity
 
     # Place Operations
     def create_place(self, place_data):
@@ -93,7 +77,27 @@ class HBnBFacade:
 
         place.update(data)
         return place
-    
+
+    # Amenity operations
+    def create_amenity(self, amenity_data):
+        amenity = Amenity(**amenity_data)
+        self.amenity_repo.add(amenity)
+        return amenity
+
+    def get_amenity(self, amenity_id):
+        return self.amenity_repo.get(amenity_id)
+
+    def get_all_amenities(self):
+        return self.amenity_repo.get_all()
+
+    def update_amenity(self, amenity_id, amenity_data):
+        amenity = self.get_amenity(amenity_id)
+        if not amenity:
+            return None
+        new_amenity = {"id": amenity_id, "name": amenity_data.get("name")}
+        self.amenity_repo.update(amenity_id, new_amenity)
+        return new_amenity
+
     # Review Operations
     def create_review(self, review_data):
         user = self.get_user(review_data.get("user_id"))

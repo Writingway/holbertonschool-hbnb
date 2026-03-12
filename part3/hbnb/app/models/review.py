@@ -1,7 +1,14 @@
 from app.models.base_model import BaseModel
+from app import db
 
 
 class Review(BaseModel):
+    __tablename__ = 'reviews'
+
+    id = db.Column(db.String(100), primary_key=True)
+    text = db.Column(db.String(100), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+
     def __init__(self, text, rating, place, user):
         super().__init__()
 
