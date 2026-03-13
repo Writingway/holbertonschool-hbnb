@@ -1,7 +1,13 @@
 from app.models.base_model import BaseModel
 from app.models.user import User
 from app import db
+from sqlalchemy.orm import relationship
 
+
+places_amenities = db.Table('places_amenities',
+    db.Column('place_id', db.String(36), db.ForeignKey('places.id'), primary_key=True),
+    db.Column('amenity_id', db.String(100), db.ForeignKey('amenities.id'), primary_key=True)
+)
 
 class Place(BaseModel):
     __tablename__ = 'places'
@@ -15,6 +21,9 @@ class Place(BaseModel):
     # TODO: Do not include relationships
     # amenities = db.Column(db.PickleType, default=[])
     # reviews = db.Column(db.PickleType, default=[])
+    reviews = relationship('Review', backref='place', lazy=True)
+    amenities = relationship('Amenity', secondary=places_amenities, lazy='subquery',
+                           backref=db.backref('sibling_places', lazy=True))
 
     def __init__(self, title, description, price, latitude, longitude, owner):
         super().__init__()
@@ -26,8 +35,8 @@ class Place(BaseModel):
         self.longitude = self._validate_field("longitude", longitude, float, None, True, min_value=-180, max_value=180)
         owner = self._validate_field("owner", owner, expected_type=User, required=True)
         self.owner_id = owner.id
-        self.amenities = []  # List of amenity IDs
-        self.reviews = []    # List of review
+        # self.amenities = []  # Handled by relationship
+        # self.reviews = []    # Handled by relationship
 
     def add_amenity(self, amenity_id):
         """Add an amenity to the place"""
