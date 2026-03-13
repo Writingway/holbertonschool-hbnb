@@ -98,7 +98,6 @@ class PlaceResource(Resource):
         owner = facade.get_user(place.owner_id)
         if not owner:
             return {"error": "Owner not found"}, 404
-
         return {
             "id": place.id,
             "title": place.title,
@@ -115,18 +114,19 @@ class PlaceResource(Resource):
             },
             "amenities": [
                 {
-                    "id": amenity_id,
-                    "name": facade.get_amenity(amenity_id).name
+                    "id": amenity.id,
+                    "name": amenity.name
                 }
-                for amenity_id in place.amenities
+                for amenity in place.amenities
             ],
             "reviews": [
                 {
-                    "id": review_id,
-                    "text": facade.get_review(review_id),
-                    "rating": facade.get_review(review_id).rating
+                    "id": review.id,
+                    "text": review.text,
+                    "rating": review.rating,
+                    "user_id": review.user_id
                 }
-                for review_id in place.reviews
+                for review in place.reviews
             ]
         }, 200
 
