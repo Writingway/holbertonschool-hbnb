@@ -82,6 +82,9 @@ class HBnBFacade:
         place.update(data)
         return place
 
+    def delete_place(self, place_id):
+        self.place_repo.delete(place_id)
+
     # Amenity operations
     def create_amenity(self, amenity_data):
         amenity = Amenity(**amenity_data)

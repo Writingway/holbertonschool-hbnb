@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 api = Namespace('places', description='Place operations')
 
@@ -139,13 +139,16 @@ class PlaceResource(Resource):
         """Update a place's information"""
         try:
             place_data = api.payload
-            current_user = get_jwt_identity()
+            current_user = get_jwt()
+            is_admin = current_user.get('is_admin')
+            user_id = current_user.get('sub')
+
             place = facade.get_place(place_id)
             if not place:
                 return {"error": "Place not found"}, 404
             # Show the data of place
 
-            if place.owner_id != current_user:
+            if place.owner_id != user_id and not is_admin:
                 return {"error": "Unauthorized action."}, 403
 
             updated_place = facade.update_place(place_id, place_data)
@@ -161,6 +164,25 @@ class PlaceResource(Resource):
             return {"message": "Place updated successfully"}, 200
         except (ValueError, TypeError, KeyError) as e:
             return {'error': str(e)}, 400
+
+    @api.response(200, 'Place deleted successfully')
+    @api.response(404, 'Place not found')
+    @jwt_required()
+    def delete(self, place_id):
+        """Delete a place"""
+        current_user = get_jwt()
+        is_admin = current_user.get('is_admin')
+        user_id = current_user.get('sub')
+
+        place = facade.get_place(place_id)
+        if not place:
+            return {'message': 'Place not found'}, 404
+
+        if place.owner_id != user_id and not is_admin:
+            return {'error': 'Unauthorized action'}, 403
+
+        facade.delete_place(place_id)
+        return {'message': 'Place successfully deleted'}, 200
 
 
 @api.route('/<place_id>/reviews')

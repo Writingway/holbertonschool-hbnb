@@ -1,7 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.user import User
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 api = Namespace('users', description='User operations')
 
@@ -20,10 +20,14 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         """Register a new user"""
         try:
             user_data = api.payload
+            current_user = get_jwt()
+            if not current_user.get('is_admin'):
+                return {'error': 'Admin privileges required'}, 403
             # Simulate email uniqueness check (to be replaced by real validation with persistence)
             existing_user = facade.get_user_by_email(user_data['email'])
             if existing_user:
@@ -77,14 +81,15 @@ class UserResource(Resource):
             return {'error': 'User not found'}, 404
 
         data = api.payload
-        current_user = get_jwt_identity()
+        current_user = get_jwt()
+        is_admin = current_user.get('is_admin')
         if not data:
             return {'error': 'No input data is invalid'}, 400
-        if current_user != user_id:
+        if current_user != user_id and not is_admin:
             return {'error': 'Unauthorized action'}, 403
-        # Prevent the user from modifying their email and password in this endpoint.
-        if 'email' in data or 'password' in data:
-            return {'error': 'You cannot modify email or password.'}, 400
+        if not is_admin:
+            if 'email' in data or 'password' in data:
+                return {'error': 'You cannot modify email or password.'}, 400
 
         updated_user = facade.update_user(user_id, data)
         if not updated_user:
