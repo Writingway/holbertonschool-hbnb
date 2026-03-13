@@ -59,7 +59,11 @@ class HBnBFacade:
             owner=owner,
         )
 
-        place.amenities = place_data.get("amenities", [])
+        amenity_ids = place_data.get("amenities", [])
+        for amenity_id in amenity_ids:
+            amenity = self.get_amenity(amenity_id)
+            if amenity:
+                place.amenities.append(amenity)
 
         self.place_repo.add(place)
         return place
