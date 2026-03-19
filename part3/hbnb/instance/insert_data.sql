@@ -3,7 +3,8 @@ INSERT INTO users (id, first_name, last_name, email, password, is_admin, created
 VALUES
 ('a1111111-1111-1111-1111-111111111111','Alice','Dupont','alice@mail.com','$2b$12$XWq3b0c5h9kU8sHxYgR0ne1ZTcKmEvz3iVFO0YvJZmLQ1P0wFDSi2',FALSE, datetime('now'), datetime('now')),
 ('b2222222-2222-2222-2222-222222222222','Bob','Martin','bob@mail.com','$2b$12$XWq3b0c5h9kU8sHxYgR0ne1ZTcKmEvz3iVFO0YvJZmLQ1P0wFDSi2',FALSE, datetime('now'), datetime('now')),
-('c3333333-3333-3333-3333-333333333333','Carla','Leroy','carla@mail.com','$2b$12$XWq3b0c5h9kU8sHxYgR0ne1ZTcKmEvz3iVFO0YvJZmLQ1P0wFDSi2',FALSE, datetime('now'), datetime('now'));
+('c3333333-3333-3333-3333-333333333333','Carla','Leroy','carla@mail.com','$2b$12$XWq3b0c5h9kU8sHxYgR0ne1ZTcKmEvz3iVFO0YvJZmLQ1P0wFDSi2',FALSE, datetime('now'), datetime('now')),
+('c4444444-4444-4444-4444-444444444444','Admin','Leroy','admin@mail.com','$2b$12$4xDOAnY/hCxAZJx1gqOhNOELtJLTM/2dyfrqZv95V9QtdPgsBfJ7q',TRUE, datetime('now'), datetime('now'));
 
 -- --- PLACES TEST ---
 INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)

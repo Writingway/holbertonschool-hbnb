@@ -14,6 +14,7 @@ login_model = api.model('Login', {
 @api.route('/login')
 class Login(Resource):
     @api.expect(login_model)
+    @api.doc(security=[])  # Cette route ne nécessite pas d'authentification
     def post(self):
         """Authenticate user and return a JWT token"""
         credentials = api.payload  # Get the email and password from the request payload
