@@ -1,32 +1,43 @@
-# HBnB - Part 2
+# HBnB - Part 3 (Database & Authentication)
 
 ## 📌 Overview
 
-In this phase of the HBnB project, we implement the **Presentation** and **Business Logic** layers using Python and Flask. The project structure, business classes, and RESTful API endpoints are fully functional, covering user, place, review, and amenity management following REST best practices.
+In this phase of the HBnB project, we extend Part 2 by integrating a **relational database (SQL)**, implementing **JWT-based authentication**, and adding **role-based access control** (admin checks). The project maintains the modular 3-layer architecture while replacing in-memory storage with persistent database storage and adding security features.
 
-JWT authentication and role management will be addressed in a later phase with Flask and flask-restx.
+### Key Additions in Part 3:
+- **Database Integration**: SQL-based repository with SQLAlchemy ORM relationships
+- **JWT Authentication**: Secure login endpoint with token-based access
+- **Role-Based Access**: Admin checks for protected operations
+- **Place Deletion**: DELETE endpoint for places with authorization
+- **Database Relations**: Proper foreign key relationships between entities
 
 ## ✅ Objectives
 
-- **Set Up the Project Structure:**
-  Organize the project into a modular architecture, following best practices for Python and Flask applications. Create the necessary packages for the Presentation and Business Logic layers.
+- **Integrate a Relational Database:**
+  Replace in-memory repository with SQL database, implement proper relationships between entities, and use the repository pattern for data persistence.
 
-- **Implement the Business Logic Layer:**
-  Develop core classes (`User`, `Place`, `Review`, `Amenity`), implement relationships between entities, and use the **Facade pattern** to simplify communication between layers.
+- **Implement JWT Authentication:**
+  Create login endpoint that issues JWT tokens, validate credentials using password hashing, and include admin claims in tokens.
 
-- **Build RESTful API Endpoints:**
-  Implement CRUD operations for all entities using flask-restx, with data serialization returning extended attributes for related objects.
+- **Add Authorization & Role Management:**
+  Implement protected endpoints with admin-only access checks for sensitive operations like user and place deletion.
 
-- **Test and Validate the API:**
-  Ensure each endpoint works correctly and handles edge cases via automated unit tests and manual testing with cURL or Postman.
+- **Enhance Business Logic Layer:**
+  Build core classes with database relationships, maintain the **Facade pattern**, and implement proper validation and error handling.
+
+- **Test and Validate Security:**
+  Ensure authentication flows work correctly, validate authorization checks, and test database constraints.
 
 ## 🧾 Learning Objectives
 
-- Modular Design and Architecture
-- API Development with Flask and flask-restx
-- Business Logic Implementation
-- Data Serialization and Composition Handling
-- Testing and Debugging
+- Relational Database Design and Integration
+- JWT Authentication and Authorization
+- Role-Based Access Control (RBAC)
+- SQLAlchemy ORM and Relationships
+- Repository Pattern for Data Persistence
+- API Security Best Practices
+- Password Hashing and Credential Validation
+- Modular Architecture with Database Layer
 
 ## 📁 Project Structure
 
@@ -41,58 +52,78 @@ hbnb/
 │   │       ├── users.py
 │   │       ├── places.py
 │   │       ├── reviews.py
-│   │       └── amenities.py
+│   │       ├── amenities.py
+│   │       ├── auth.py              # NEW: JWT Login endpoint
+│   │       └── protected.py         # NEW: Protected endpoints for admin
 │   ├── models/
 │   │   ├── __init__.py
 │   │   ├── base_model.py
-│   │   ├── user.py
+│   │   ├── user.py                 # Updated: password hashing & is_admin
 │   │   ├── place.py
 │   │   ├── review.py
 │   │   └── amenity.py
 │   ├── services/
 │   │   ├── __init__.py
-│   │   └── facade.py
+│   │   └── facade.py               # Updated: database operations
 │   └── persistence/
 │       ├── __init__.py
-│       └── repository.py
+│       ├── repository.py           # Updated: SQL-based repository
+│       └── repositories/           # NEW: Specialized repositories
+│           ├── __init__.py
+│           ├── user_repository.py
+│           ├── place_repository.py
+│           ├── review_repository.py
+│           └── amenity_repository.py
+├── instance/
+│   ├── drop_and_create_tables.sql   # NEW: Database schema
+│   └── insert_data.sql              # NEW: Sample data
 ├── tests/
 │   ├── __init__.py
 │   ├── test_user.py
+│   ├── test_amenity.py
 │   ├── test_place.py
-│   ├── test_review.py
-│   └── test_amenity.py
+│   └── test_review.py
 ├── run.py
-├── config.py
-├── requirements.txt
+├── config.py                       # Updated: database configuration
+├── requirements.txt                # Updated: added SQLAlchemy, Flask-JWT
 └── README.md
 ```
 
-### Key Files
+### Key Files - Part 3 Additions
 
-| File                            | Role                                                                                   |
-| ------------------------------- | -------------------------------------------------------------------------------------- |
-| `app/__init__.py`               | Creates the Flask app and registers all API namespaces                                 |
-| `app/services/facade.py`        | Central hub for all business logic operations (Facade pattern)                         |
-| `app/persistence/repository.py` | In-memory storage (will be replaced by SQL in Part 3)                                  |
-| `app/models/base_model.py`      | Provides `id` (UUID), `created_at`, `updated_at`, and validation helpers to all models |
+| File                                    | Role                                                                                 |
+| --------------------------------------- | ------------------------------------------------------------------------------------ |
+| `app/api/v1/auth.py`                    | JWT login endpoint with credential validation                                       |
+| `app/api/v1/protected.py`               | Protected endpoints with admin-only access checks                                    |
+| `app/persistence/repositories/`         | Specialized repositories for each entity with database queries                       |
+| `app/models/user.py`                    | Updated with password hashing, `is_admin` flag, and `verify_password()` method       |
+| `instance/drop_and_create_tables.sql`   | Database schema with foreign key relationships                                       |
+| `config.py`                             | Database connection configuration                                                    |
 
 ## ⚒️ Architecture
 
-The application follows a **3-layer architecture**:
+The application follows a **4-layer architecture** (Part 3):
 
-| Layer              | Description                                                    | Location                        |
-| ------------------ | -------------------------------------------------------------- | ------------------------------- |
-| **Presentation**   | Flask-RESTX API endpoints                                      | `app/api/v1/`                   |
-| **Business Logic** | Models (`User`, `Place`, `Review`, `Amenity`) + Facade pattern | `app/models/` + `app/services/` |
-| **Persistence**    | In-memory repository                                           | `app/persistence/`              |
+| Layer              | Description                                                              | Location                        |
+| ------------------ | ------------------------------------------------------------------------ | ------------------------------- |
+| **Presentation**   | Flask-RESTX API endpoints (CRUD + Auth)                                  | `app/api/v1/`                   |
+| **Business Logic** | Models (`User`, `Place`, `Review`, `Amenity`) + Facade pattern           | `app/models/` + `app/services/` |
+| **Persistence**    | SQL-based repositories with SQLAlchemy ORM relationships                  | `app/persistence/`              |
+| **Database**       | Relational database (SQL) with foreign key relationships                  | `instance/`                     |
 
-### Facade Pattern
+### Facade Pattern & Repositories
 
-All API endpoints communicate exclusively through a single `HBnBFacade` instance, which acts as the unique entry point to the business logic:
+All API endpoints communicate exclusively through a single `HBnBFacade` instance, which delegates to specialized repositories:
 
 ```
-API → HBnBFacade → Models / Repository
+API → HBnBFacade → Repositories → Database
 ```
+
+Each repository handles:
+- ✅ Entity-specific queries
+- ✅ Relationship management (through ORM)
+- ✅ Validation and constraints
+- ✅ CRUD operations with persistence
 
 ## 📥 Installation & Setup
 
@@ -108,7 +139,7 @@ API → HBnBFacade → Models / Repository
 
 ```bash
 git clone https://github.com/<your-username>/holbertonschool-hbnb.git
-cd holbertonschool-hbnb/part2/hbnb
+cd holbertonschool-hbnb/part3/hbnb
 ```
 
 2. Create a virtual environment (recommended):
@@ -136,20 +167,65 @@ python run.py
 
 3. Swagger documentation is accessible at: http://127.0.0.1:5000/api/v1/
 
-## 🔁 API Endpoints & cURL Examples
+## � Authentication & Authorization
 
-> 💡 All endpoints are prefixed with `/api/v1/`
+### JWT Login
+
+Part 3 introduces JWT-based authentication for secure API access.
+
+| Method | Endpoint            | Description                  | Status Codes |
+| ------ | ------------------- | ---------------------------- | ------------ |
+| POST   | `/api/v1/auth/login` | Authenticate and get JWT token | 201, 401     |
+
+**Login with Credentials**
+
+```bash
+curl -X POST http://127.0.0.1:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john.doe@example.com",
+    "password": "your_password"
+  }'
+```
+
+Response (201):
+
+```json
+{
+  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+}
+```
+
+### Using JWT Tokens in Protected Endpoints
+
+Include the token in the `Authorization` header for protected operations:
+
+```bash
+curl -X DELETE http://127.0.0.1:5000/api/v1/places/<place_id> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+### Admin Access
+
+Certain endpoints (like place and user deletion) require `is_admin` claim in the JWT token. Only users with `is_admin=true` can access these operations.
 
 ---
 
+## 🔁 API Endpoints & cURL Examples
+
+> 💡 All endpoints are prefixed with `/api/v1/`
+> 
+> ⚠️ Some endpoints require JWT authentication (marked with 🔒)
+
 ### Users
 
-| Method | Endpoint                  | Description           | Status Codes  |
-| ------ | ------------------------- | --------------------- | ------------- |
-| POST   | `/api/v1/users/`          | Register a new user   | 201, 400      |
-| GET    | `/api/v1/users/`          | Retrieve all users    | 200           |
-| GET    | `/api/v1/users/<user_id>` | Retrieve a user by ID | 200, 404      |
-| PUT    | `/api/v1/users/<user_id>` | Update a user         | 200, 400, 404 |
+| Method | Endpoint                  | Description           | Status Codes    |
+| ------ | ------------------------- | --------------------- | --------------- |
+| POST   | `/api/v1/users/`          | Register a new user   | 201, 400        |
+| GET    | `/api/v1/users/`          | Retrieve all users    | 200             |
+| GET    | `/api/v1/users/<user_id>` | Retrieve a user by ID | 200, 404        |
+| PUT    | `/api/v1/users/<user_id>` | Update a user         | 200, 400, 404   |
+| DELETE | `/api/v1/users/<user_id>` | 🔒 Delete a user (admin only) | 200, 403, 404   |
 
 **Create a User**
 
@@ -242,13 +318,14 @@ curl -X PUT http://127.0.0.1:5000/api/v1/amenities/<amenity_id> \
 
 ### Places
 
-| Method | Endpoint                            | Description                 | Status Codes  |
-| ------ | ----------------------------------- | --------------------------- | ------------- |
-| POST   | `/api/v1/places/`                   | Create a new place          | 201, 400      |
-| GET    | `/api/v1/places/`                   | Retrieve all places         | 200           |
-| GET    | `/api/v1/places/<place_id>`         | Retrieve a place by ID      | 200, 404      |
-| PUT    | `/api/v1/places/<place_id>`         | Update a place              | 200, 400, 404 |
-| GET    | `/api/v1/places/<place_id>/reviews` | Get all reviews for a place | 200, 404      |
+| Method | Endpoint                            | Description                           | Status Codes    |
+| ------ | ----------------------------------- | ------------------------------------- | --------------- |
+| POST   | `/api/v1/places/`                   | Create a new place                    | 201, 400        |
+| GET    | `/api/v1/places/`                   | Retrieve all places                   | 200             |
+| GET    | `/api/v1/places/<place_id>`         | Retrieve a place by ID                | 200, 404        |
+| PUT    | `/api/v1/places/<place_id>`         | Update a place                        | 200, 400, 404   |
+| DELETE | `/api/v1/places/<place_id>`         | 🔒 Delete a place (owner/admin only)   | 200, 403, 404   |
+| GET    | `/api/v1/places/<place_id>/reviews` | Get all reviews for a place           | 200, 404        |
 
 **Create a Place**
 
@@ -361,7 +438,7 @@ Response (200):
 
 ## 🧪 Unit Tests
 
-The project includes a comprehensive test suite located in the `tests/` directory, covering all API endpoints with **53 tests** across 4 test files.
+The project includes a comprehensive test suite located in the `tests/` directory. Tests cover all API endpoints for users, amenities, places, and reviews.
 
 ### Running the Tests
 
@@ -369,114 +446,110 @@ The project includes a comprehensive test suite located in the `tests/` director
 python3 -m unittest discover -s tests -v
 ```
 
-### Test Report Summary
+> 📝 **Note**: Tests in Part 3 use in-memory repositories for isolation. Database integration tests are **not yet implemented**.
+
+### Test Coverage
+
+| Module              | Status | Description                                                    |
+| ------------------- | ------ | -------------------------------------------------------------- |
+| User CRUD + Validation   | ✅ Complete | Create, read, update operations with input validation           |
+| Amenity CRUD         | ✅ Complete | Create, read, update operations                                |
+| Place CRUD + Validation  | ✅ Complete | Create, read, update + boundary testing for coordinates        |
+| Review CRUD + Delete     | ✅ Complete | Full lifecycle testing including delete operations             |
+| **Authentication**   | ❌ Pending  | JWT token generation, login flow validation                    |
+| **Authorization**    | ❌ Pending  | Admin checks for delete operations, role-based access          |
+| **Database Layer**   | ❌ Pending  | SQLAlchemy ORM relationships, persistence verification         |
+| **Error Handling**   | ⚠️ Partial  | Coverage for validation errors; missing HTTP exception tests   |
+
+### Future Test Enhancements
+
+- ✅ Implement authentication tests:
+  - Successful login with valid credentials
+  - Failed login with invalid credentials
+  - JWT token validation and expiration
+  
+- ✅ Implement authorization tests:
+  - Admin-only deletion attempts (403 Forbidden)
+  - Owner-only place deletion verification
+  - Token refresh and revocation
+  
+- ✅ Implement database integration tests:
+  - Verify persistent storage
+  - Test foreign key relationships
+  - Test cascade delete operations
+  
+- ✅ Implement comprehensive error handling tests:
+  - Database connection failures
+  - Constraint violations
+  - Transaction rollback scenarios
+
+---
+
+## 📊 Architecture Diagrams
+
+### High-Level Class Diagram
+
+The HBnB system architecture follows a modular design with distinct layers:
 
 ```
-Ran 53 tests in 0.500s
-
-OK
+┌─────────────────────────────────────────────────┐
+│          Presentation Layer (API)               │
+│  /users  /places  /reviews  /amenities  /auth   │
+└─────────────────────────────────────────────────┘
+                      ↓
+┌─────────────────────────────────────────────────┐
+│       Business Logic Layer (Facade)             │
+│         HBnBFacade (Central Hub)                │
+└─────────────────────────────────────────────────┘
+                      ↓
+┌─────────────────────────────────────────────────┐
+│    Persistence Layer (Repositories)             │
+│  UserRepo | PlaceRepo | ReviewRepo | AmenityRepo
+└─────────────────────────────────────────────────┘
+                      ↓
+┌─────────────────────────────────────────────────┐
+│    Database Layer (SQL)                         │
+│  Users | Places | Reviews | Amenities (Tables) │
+└─────────────────────────────────────────────────┘
 ```
 
-### Test Files Overview
+### Sequence Diagrams
 
-| File                    | Entity  | Tests | Description                                      |
-| ----------------------- | ------- | ----- | ------------------------------------------------ |
-| `tests/test_user.py`    | User    | 11    | CRUD operations + validation                     |
-| `tests/test_amenity.py` | Amenity | 8     | CRUD operations + validation                     |
-| `tests/test_place.py`   | Place   | 16    | CRUD operations + validation + boundary tests    |
-| `tests/test_review.py`  | Review  | 18    | CRUD operations + validation + boundary + delete |
+The `/part1/` directory contains detailed Mermaid sequence diagrams for key user flows:
 
-### Detailed Test Breakdown
+- **[User Registration](../part1/Sequence-Diagram-User_Registration.mmd)** — User creation with validation
+- **[Place Creation](../part1/Sequence-Diagram-Place_Creation.mmd)** — Place submission with owner assignment
+- **[Review Submission](../part1/Sequence-Diagram-Review_Submission.mmd)** — Review creation with references
+- **[Fetching Places List](../part1/Sequence-Diagram-Fetching_a_List_of_Places.mmd)** — Retrieving places with filters
 
-#### `test_user.py` — 11 tests
+### Database Diagram
 
-| Test                                | Description                | Expected |
-| ----------------------------------- | -------------------------- | -------- |
-| `test_create_user`                  | Create a valid user        | 201      |
-| `test_create_user_empty_first_name` | Empty first_name           | 400      |
-| `test_create_user_empty_last_name`  | Empty last_name            | 400      |
-| `test_create_user_invalid_email`    | Invalid email format       | 400      |
-| `test_create_user_duplicate_email`  | Duplicate email address    | 400      |
-| `test_create_user_name_too_long`    | first_name > 50 chars      | 400      |
-| `test_get_user_by_id`               | Retrieve user by valid ID  | 200      |
-| `test_get_user_not_found`           | Retrieve non-existent user | 404      |
-| `test_get_all_users`                | List all users             | 200      |
-| `test_update_user`                  | Update an existing user    | 200      |
-| `test_update_user_not_found`        | Update non-existent user   | 404      |
+Database schema with relationships:
 
-#### `test_amenity.py` — 8 tests
+- **Users** ← (1:Many) → **Places** (owner_id)
+- **Users** ← (1:Many) → **Reviews** (user_id)
+- **Places** ← (1:Many) → **Reviews** (place_id)
+- **Amenities** ← (Many:Many) → **Places** (association table)
 
-| Test                                | Description                   | Expected |
-| ----------------------------------- | ----------------------------- | -------- |
-| `test_create_amenity`               | Create a valid amenity        | 201      |
-| `test_create_amenity_empty_name`    | Empty name                    | 400      |
-| `test_create_amenity_name_too_long` | name > 50 chars               | 400      |
-| `test_get_amenity_by_id`            | Retrieve amenity by valid ID  | 200      |
-| `test_get_amenity_not_found`        | Retrieve non-existent amenity | 404      |
-| `test_get_all_amenities`            | List all amenities            | 200      |
-| `test_update_amenity`               | Update an existing amenity    | 200      |
-| `test_update_amenity_not_found`     | Update non-existent amenity   | 404      |
-
-#### `test_place.py` — 16 tests
-
-| Test                                           | Description                 | Expected |
-| ---------------------------------------------- | --------------------------- | -------- |
-| `test_create_place`                            | Create a valid place        | 201      |
-| `test_create_place_missing_title`              | Empty title                 | 400      |
-| `test_create_place_negative_price`             | Negative price              | 400      |
-| `test_create_place_zero_price`                 | Zero price                  | 400      |
-| `test_create_place_invalid_latitude`           | Latitude > 90               | 400      |
-| `test_create_place_invalid_latitude_negative`  | Latitude < -90              | 400      |
-| `test_create_place_invalid_longitude`          | Longitude > 180             | 400      |
-| `test_create_place_invalid_longitude_negative` | Longitude < -180            | 400      |
-| `test_create_place_invalid_owner`              | Non-existent owner_id       | 400      |
-| `test_create_place_latitude_boundary_90`       | Latitude = 90 (boundary)    | 201      |
-| `test_create_place_latitude_boundary_minus90`  | Latitude = -90 (boundary)   | 201      |
-| `test_create_place_longitude_boundary_180`     | Longitude = 180 (boundary)  | 201      |
-| `test_get_place_by_id`                         | Retrieve place by valid ID  | 200      |
-| `test_get_place_not_found`                     | Retrieve non-existent place | 404      |
-| `test_get_all_places`                          | List all places             | 200      |
-| `test_update_place`                            | Update an existing place    | 200      |
-| `test_update_place_not_found`                  | Update non-existent place   | 404      |
-
-#### `test_review.py` — 18 tests
-
-| Test                                         | Description                    | Expected |
-| -------------------------------------------- | ------------------------------ | -------- |
-| `test_create_review`                         | Create a valid review          | 201      |
-| `test_create_review_empty_text`              | Empty text                     | 400      |
-| `test_create_review_invalid_rating_too_high` | Rating > 5                     | 400      |
-| `test_create_review_invalid_rating_too_low`  | Rating < 1                     | 400      |
-| `test_create_review_invalid_user`            | Non-existent user_id           | 400      |
-| `test_create_review_invalid_place`           | Non-existent place_id          | 400      |
-| `test_create_review_rating_min`              | Rating = 1 (boundary)          | 201      |
-| `test_create_review_rating_max`              | Rating = 5 (boundary)          | 201      |
-| `test_get_review_by_id`                      | Retrieve review by valid ID    | 200      |
-| `test_get_review_not_found`                  | Retrieve non-existent review   | 404      |
-| `test_get_all_reviews`                       | List all reviews               | 200      |
-| `test_update_review`                         | Update an existing review      | 200      |
-| `test_update_review_not_found`               | Update non-existent review     | 404      |
-| `test_delete_review`                         | Delete an existing review      | 200      |
-| `test_delete_review_not_found`               | Delete non-existent review     | 404      |
-| `test_get_reviews_by_place`                  | Get reviews for a place        | 200      |
-| `test_get_reviews_by_place_not_found`        | Reviews for non-existent place | 404      |
-
-### Test Design Notes
-
-- Each test class clears all in-memory repositories in `setUp()` to ensure **test isolation** (no state leaks between tests).
-- Tests cover **valid cases**, **invalid input validation** (empty fields, wrong types, out-of-range values), **not-found scenarios** (404), and **boundary values** (edge cases like lat=90, rating=1).
-- Review tests include a full lifecycle: create → read → update → delete.
+---
 
 ## 📘 Resources
 
+### Part 3 Core Documentation
+- [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/) — ORM integration for Flask
+- [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/) — JWT authentication for Flask
+- [SQLAlchemy Relationships](https://docs.sqlalchemy.org/en/14/orm/basic_relationships.html) — Database relationship patterns
+- [Password Hashing with Werkzeug](https://werkzeug.palletsprojects.com/en/2.0.x/security/) — Secure password handling
+
+### General References
 - [Flask Documentation](https://flask.palletsprojects.com/)
 - [Flask-RESTx Documentation](https://flask-restx.readthedocs.io/)
 - [Python Project Structure Best Practices](https://docs.python-guide.org/writing/structure/)
 - [Facade Design Pattern in Python](https://refactoring.guru/design-patterns/facade/python/example)
-- [Python OOP Basics](https://docs.python.org/3/tutorial/classes.html)
-- [Why You Should Use UUIDs](https://segment.com/blog/a-brief-history-of-the-uuid/)
-- [Testing REST APIs with cURL](https://everything.curl.dev/)
-- [Designing RESTful APIs](https://restfulapi.net/)
+- [Repository Pattern Guide](https://medium.com/@pererikbergman/the-repository-pattern-f1c32fbc2f70)
+- [REST API Best Practices](https://restfulapi.net/)
+- [JWT Best Practices](https://tools.ietf.org/html/rfc8725)
+- [OWASP API Security](https://owasp.org/www-project-api-security/)
 
 ## 👥 Authors
 
