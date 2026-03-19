@@ -5,7 +5,7 @@ erDiagram
         int id PK
         string first_name
         string last_name
-        string email UNIQUE
+        string email
         string password
         boolean is_admin
     }
@@ -34,14 +34,13 @@ erDiagram
     }
 
     PLACE_AMENITY {
-        int place_id PK, FK
-        int amenity_id PK, FK
+        int place_id FK
+        int amenity_id FK
     }
 
     USER ||--o{ PLACE : owns
     USER ||--o{ REVIEW : writes
     PLACE ||--o{ REVIEW : receives
-
     PLACE ||--o{ PLACE_AMENITY : has
-    AMENITY ||--o{ PLACE_AMENITY : included_in
+    AMENITY ||--o{ PLACE_AMENITY : includes
 ```
