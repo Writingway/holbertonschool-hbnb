@@ -2,7 +2,7 @@
 erDiagram
 
     USER {
-        int id PK
+        string id PK
         string first_name
         string last_name
         string email
@@ -11,7 +11,7 @@ erDiagram
     }
 
     PLACE {
-        int id PK
+        uuid id PK
         string title
         string description
         float price
@@ -21,7 +21,7 @@ erDiagram
     }
 
     REVIEW {
-        int id PK
+        string id PK
         string text
         int rating
         int user_id FK
@@ -29,7 +29,7 @@ erDiagram
     }
 
     AMENITY {
-        int id PK
+        string id PK
         string name
     }
 
