@@ -20,6 +20,7 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @api.doc(security='apiKey')  # Marquer comme protégé dans Swagger
     @jwt_required()
     def post(self):
         """Register a new user"""
@@ -74,6 +75,7 @@ class UserResource(Resource):
         }, 200
 
     @api.expect(user_model)
+    @api.doc(security='apiKey')  # Marquer comme protégé dans Swagger
     @jwt_required()
     def put(self, user_id):
         """Update user details by ID (to be implemented in later tasks)"""

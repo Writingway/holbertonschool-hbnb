@@ -15,6 +15,7 @@ class AmenityList(Resource):
     @api.expect(amenity_model)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
+    @api.doc(security='apiKey')  # Marquer comme protégé dans Swagger
     @jwt_required()
     def post(self):
         """Register a new amenity"""
@@ -52,6 +53,7 @@ class AmenityResource(Resource):
     @api.response(200, 'Amenity updated successfully')
     @api.response(404, 'Amenity not found')
     @api.response(400, 'Invalid input data')
+    @api.doc(security='apiKey')  # Marquer comme protégé dans Swagger
     @jwt_required()
     def put(self, amenity_id):
         """Update an amenity's information"""

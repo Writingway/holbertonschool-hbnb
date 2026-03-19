@@ -23,6 +23,7 @@ class ReviewList(Resource):
     @api.expect(review_model)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
+    @api.doc(security='apiKey')  # Marquer comme protégé dans Swagger
     @jwt_required()
     def post(self):
         """Register a new review"""
@@ -86,6 +87,7 @@ class ReviewResource(Resource):
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
+    @api.doc(security='apiKey')  # Marquer comme protégé dans Swagger
     @jwt_required()
     def put(self, review_id):
         """Update a review's information"""
