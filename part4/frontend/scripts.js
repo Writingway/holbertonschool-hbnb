@@ -64,7 +64,7 @@ async function fetchPlaceDetails(token, placeId) {
     }
 }
 
-async function submitReview(token, placeId, reviewText) {
+async function submitReview(token, placeId, reviewText, rating) {
     // Make a POST request to submit review data
     // Include the token in the Authorization header
     // Send placeId and reviewText in the request body
@@ -78,17 +78,26 @@ async function submitReview(token, placeId, reviewText) {
         headers.Authorization = `Bearer ${token}`;
     }
 
-    const response = await fetch(`http://localhost:5000/api/v1/places/${placeId}/reviews`, {
+    const response = await fetch(`http://localhost:5000/api/v1/reviews/`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ text: reviewText })
+        body: JSON.stringify({ text: reviewText, place_id: placeId, rating: parseInt(rating) })
     });
 
     if (response.ok) {
         alert('Review submitted successfully!');
         window.location.href = `place.html?id=${placeId}`;
     } else {
-        alert('Failed to submit review: ' + response.statusText);
+        let errorMessage = response.statusText;
+
+        try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorData.msg || errorData.message || errorMessage;
+        } catch (e) {
+            // Keep HTTP status text when response body is not valid JSON.
+        }
+
+        alert('Failed to submit review: ' + errorMessage);
     }
 }
 
@@ -144,10 +153,10 @@ function displayPlaceDetails(place) {
     }
 
     const addReviewLink = document.createElement('a');
-    addReviewLink.href = 'add_review.html';
+    addReviewLink.href = place?.id ? `add_review.html?id=${encodeURIComponent(place.id)}` : 'add_review.html';
     addReviewLink.className = 'details-button';
     addReviewLink.textContent = 'Add a Review';
-    addReviewLink.style.display = getCookie('token') ? 'inline-block' : 'none';
+    addReviewLink.style.display = getValidToken() ? 'inline-block' : 'none';
     reviewsSection.appendChild(addReviewLink);
 }
 
@@ -171,12 +180,16 @@ function displayPlaces(places) {
 }
 
 function checkAuthentication() {
-    const token = getCookie('token');
+    const token = getValidToken();
     const loginLink = document.getElementById('login-link');
     const loginForm = document.getElementById('login-form');
     const addReviewLink = document.querySelector('a[href="add_review.html"]');
     const placeId = getPlaceIdFromURL();
 
+    if (!token && document.getElementById('review-form')) {
+        window.location.href = 'index.html';
+        return;
+    }
     // If user is already authenticated and currently on login page, skip showing form.
     if (token && loginForm) {
         window.location.href = 'index.html';
@@ -193,6 +206,7 @@ function checkAuthentication() {
 
     fetchPlaces(token);
     fetchPlaceDetails(token, placeId);
+    return token;
 }
 
 function getPlaceIdFromURL() {
@@ -205,14 +219,45 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
+function clearTokenCookie() {
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+}
+
+function isTokenExpired(token) {
+    try {
+        const payloadPart = token.split('.')[1];
+        if (!payloadPart) return true;
+
+        const base64 = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+        const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+        const payload = JSON.parse(atob(padded));
+
+        if (!payload.exp) return false;
+        return Date.now() >= payload.exp * 1000;
+    } catch (e) {
+        return true;
+    }
+}
+
+function getValidToken() {
+    const token = getCookie('token');
+
+    if (!token) return null;
+
+    if (isTokenExpired(token)) {
+        clearTokenCookie();
+        return null;
+    }
+
+    return token;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const priceFilter = document.getElementById('price-filter');
     const reviewForm = document.getElementById('review-form');
     const token = checkAuthentication();
     const placeId = getPlaceIdFromURL();
-
-    checkAuthentication();
 
     if (reviewForm) {
         reviewForm.addEventListener('submit', async (event) => {
@@ -222,12 +267,20 @@ document.addEventListener('DOMContentLoaded', () => {
             // Handle the response
             const reviewText = document.getElementById('review')?.value.trim();
             const rating = document.getElementById('rating')?.value;
+            console.log('Submitting review:', { reviewText, rating, placeId, token });
             
             if (!reviewText || !rating) {
                 alert('Please provide both review text and rating.');
                 return;
             }
-            submitReview(token, placeId, reviewText);
+            const authToken = getValidToken();
+
+            if (!authToken) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            submitReview(authToken, placeId, reviewText, rating);
         });
     }
 

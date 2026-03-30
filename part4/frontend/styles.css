@@ -158,7 +158,7 @@ main { flex: 1; padding-block: 1.5rem; }
 
 #place-details .place-details h2 {
     position: absolute;
-    top: -2.75rem;
+    top: -3.75rem;
     inset-inline: 0;
     margin: 0;
     font-size: 2.2rem;
