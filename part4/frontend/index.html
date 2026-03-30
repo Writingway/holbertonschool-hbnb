@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBNB - Available Places</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html"><img src="images/logo.png" alt="HBnB logo" class="logo"></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="login.html" class="login-button">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1 class="page-title">Available Places</h1>
+        
+        <section class="filter-section">
+            <label for="price-filter">Max Price:</label>
+            <select id="price-filter" class="price-filter">
+                <option value="all">All</option>
+                <option value="100">$100</option>
+                <option value="150">$150</option>
+                <option value="200">$200</option>
+                <option value="300">$300</option>
+            </select>
+        </section>
+
+        <section id="places-list">
+            <div id="places-container" class="places-container">
+                <div class="place-card">
+                    <h3 class="place-name">Beautiful Beach House</h3>
+                    <p class="place-price">Price per night: $150</p>
+                    <a href="place.html" class="details-button">View Details</a>
+                </div>
+                <div class="place-card">
+                    <h3 class="place-name">Cozy Mountain Cabin</h3>
+                    <p class="place-price">Price per night: $200</p>
+                    <a href="place.html" class="details-button">View Details</a>
+                </div>
+                <div class="place-card">
+                    <h3 class="place-name">Modern City Apartment</h3>
+                    <p class="place-price">Price per night: $100</p>
+                    <a href="place.html" class="details-button">View Details</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>All rights reserved.</p>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
