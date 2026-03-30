@@ -13,13 +13,12 @@ db = SQLAlchemy()
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
+    CORS(app)
     # Load configuration from the specified config class
     app.config.from_object(config_class)
-
     bcrypt.init_app(app)
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app)
 
     # Configuration de la sécurité pour Swagger
     authorizations = {
