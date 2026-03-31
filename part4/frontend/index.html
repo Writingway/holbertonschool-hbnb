@@ -5,24 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HBNB - Available Places</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff9800',
+                        'primary-dark': '#e68a00',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <header>
-        <nav>
-            <a href="index.html"><img src="images/logo.png" alt="HBnB logo" class="logo"></a>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="login.html" class="login-button" id="login-link">Login</a>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+    <header class="bg-primary shadow-md sticky top-0 z-50">
+        <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html">
+                <img src="images/logo.png" alt="HBnB logo" class="logo h-9 w-auto">
+            </a>
+            <div class="nav-links flex items-center gap-4">
+                <a href="index.html" class="text-white/80 hover:text-white font-medium text-sm transition-colors">Home</a>
+                <a href="login.html"
+                   class="login-button bg-white/15 hover:bg-white/25 text-white font-semibold text-sm px-4 py-2 rounded-lg border border-white/30 transition-all"
+                   id="login-link">Login</a>
             </div>
         </nav>
     </header>
 
-    <main>
-        <h1 class="page-title">Available Places</h1>
-        
-        <section class="filter-section">
-            <label for="price-filter">Max Price:</label>
-            <select id="price-filter" class="price-filter">
+    <main class="max-w-6xl mx-auto w-full px-6 py-10 flex-1">
+        <h1 class="page-title text-center text-3xl font-bold mb-8" style="font-family: 'Playfair Display', serif">Available Places</h1>
+
+        <section class="filter-section flex items-center justify-center gap-3 mb-8">
+            <label for="price-filter" class="text-sm font-semibold text-gray-600">Max Price:</label>
+            <select id="price-filter" class="price-filter text-sm text-gray-800 bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
                 <option value="10">$10</option>
                 <option value="50">$50</option>
                 <option value="100">$100</option>
@@ -31,13 +50,13 @@
         </section>
 
         <section id="places-list">
-            <div id="places-container" class="places-container">
+            <div id="places-container" class="places-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             </div>
         </section>
     </main>
 
-    <footer>
-        <p>All rights reserved.</p>
+    <footer class="bg-primary mt-auto py-2 text-center">
+        <p class="text-white/80 text-sm">All rights reserved.</p>
     </footer>
 
     <script src="scripts.js"></script>

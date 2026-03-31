@@ -35,6 +35,9 @@ class HBnBFacade:
         user = self.get_user(user_id)
         if not user:
             return None
+        if "password" in new_data:
+            user.hash_password(new_data["password"])
+
         new_user = {
             "id": user_id,
             "first_name": new_data.get("first_name") or user.first_name,

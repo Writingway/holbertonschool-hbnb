@@ -14,15 +14,15 @@ class ProtectedResource(Resource):
     @jwt_required()
     def get(self):
         """A protected endpoint that requires a valid JWT token"""
-        print("jwt------")
-        print(get_jwt_identity())
+        #print("jwt------")
+        #print(get_jwt_identity())
         current_user = get_jwt_identity() # Retrieve the user's identity from the token
         #if you need to see if the user is an admin or not, you can access additional claims using get_jwt() :
         # TODO: Admin Access
         current_all_user = get_jwt()
-        print(current_all_user)
-        print("jwt------")
-        print(current_user)
+        # print(current_all_user)
+        # print("jwt------")
+        # print(current_user)
         if not current_all_user.get('is_admin'):
             return {'error': 'Admin access required'}, 403
 

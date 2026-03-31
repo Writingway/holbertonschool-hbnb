@@ -18,6 +18,7 @@ async function loginUser(email, password) {
 }
 
 async function fetchPlaces(token) {
+    if (!document.getElementById('places-container')) return;
     const headers = {};
 
     if (token) {
@@ -59,6 +60,12 @@ async function fetchPlaceDetails(token, placeId) {
     if (response.ok) {
         const data = await response.json();
         displayPlaceDetails(data);
+
+        const pageTitle = document.querySelector('.page-title');
+        if (pageTitle) {
+            pageTitle.textContent = `Reviewing: ${data.title}`;
+        }
+
     } else {
         alert('Failed to fetch place details: ' + response.statusText);
     }

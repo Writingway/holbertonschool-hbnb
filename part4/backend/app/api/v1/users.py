@@ -87,7 +87,7 @@ class UserResource(Resource):
         is_admin = current_user.get('is_admin')
         if not data:
             return {'error': 'No input data is invalid'}, 400
-        if current_user != user_id and not is_admin:
+        if current_user.get('sub') != user_id and not is_admin:
             return {'error': 'Unauthorized action'}, 403
         if not is_admin:
             if 'email' in data or 'password' in data:

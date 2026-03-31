@@ -65,10 +65,10 @@ class AmenityResource(Resource):
                 return {'error': 'Admin privileges required'}, 403
 
             updated_amenity = facade.update_amenity(amenity_id, amenity_data)
-            if len(updated_amenity.get("name")) == 0:
-                return {'error': 'Amenity name is empty'}, 400
             if not updated_amenity:
                 return {'error': 'Amenity not found'}, 404
+            if len(updated_amenity.get("name")) == 0:
+                return {'error': 'Amenity name is empty'}, 400
             return {'id': updated_amenity.get("id"), 'name': updated_amenity.get("name")}, 200
         except (ValueError, TypeError, KeyError) as e:
             return {'error': str(e)}, 400
