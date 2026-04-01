@@ -4,9 +4,20 @@ from app import db
 from sqlalchemy.orm import relationship
 
 
-places_amenities = db.Table('places_amenities',
-    db.Column('place_id', db.String(36), db.ForeignKey('places.id'), primary_key=True),
-    db.Column('amenity_id', db.String(100), db.ForeignKey('amenities.id'), primary_key=True)
+places_amenities = db.Table(
+    'places_amenities',
+    db.Column(
+        'place_id',
+        db.String(36),
+        db.ForeignKey('places.id'),
+        primary_key=True,
+    ),
+    db.Column(
+        'amenity_id',
+        db.String(100),
+        db.ForeignKey('amenities.id'),
+        primary_key=True,
+    ),
 )
 
 
@@ -18,23 +29,63 @@ class Place(BaseModel):
     price = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
-    owner_id = db.Column(db.String(50), db.ForeignKey('users.id'), nullable=False)
-    # TODO: Do not include relationships
-    # amenities = db.Column(db.PickleType, default=[])
-    # reviews = db.Column(db.PickleType, default=[])
+    owner_id = db.Column(
+        db.String(50),
+        db.ForeignKey('users.id'),
+        nullable=False,
+    )
+    # Relationship-based storage for amenities and reviews.
     reviews = relationship('Review', backref='place', lazy=True)
-    amenities = relationship('Amenity', secondary=places_amenities, lazy='subquery',
-                           backref=db.backref('sibling_places', lazy=True))
+    amenities = relationship(
+        'Amenity',
+        secondary=places_amenities,
+        lazy='subquery',
+        backref=db.backref('sibling_places', lazy=True),
+    )
 
     def __init__(self, title, description, price, latitude, longitude, owner):
         super().__init__()
 
         self.title = self._validate_field("title", title, str, 100, True)
-        self.description = self._validate_field("description", description, str, None, False)
-        self.price = self._validate_field("price", price, float, None, True, min_value=0.01)
-        self.latitude = self._validate_field("latitude", latitude, float, None, True, min_value=-90, max_value=90)
-        self.longitude = self._validate_field("longitude", longitude, float, None, True, min_value=-180, max_value=180)
-        owner = self._validate_field("owner", owner, expected_type=User, required=True)
+        self.description = self._validate_field(
+            "description",
+            description,
+            str,
+            None,
+            False,
+        )
+        self.price = self._validate_field(
+            "price",
+            price,
+            float,
+            None,
+            True,
+            min_value=0.01,
+        )
+        self.latitude = self._validate_field(
+            "latitude",
+            latitude,
+            float,
+            None,
+            True,
+            min_value=-90,
+            max_value=90,
+        )
+        self.longitude = self._validate_field(
+            "longitude",
+            longitude,
+            float,
+            None,
+            True,
+            min_value=-180,
+            max_value=180,
+        )
+        owner = self._validate_field(
+            "owner",
+            owner,
+            expected_type=User,
+            required=True,
+        )
         self.owner_id = owner.id
         # self.amenities = []  # Handled by relationship
         # self.reviews = []    # Handled by relationship

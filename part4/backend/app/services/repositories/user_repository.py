@@ -1,6 +1,5 @@
 from app.models.user import User
 from app.persistence.repository import SQLAlchemyRepository
-# TODO: Comment the import cuz idk
 from app import db
 
 

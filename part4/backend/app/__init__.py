@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, get_jwt, verify_jwt_in_request
+from flask_jwt_extended.exceptions import JWTExtendedException
 from flask_cors import CORS
 
 
@@ -38,6 +39,31 @@ def create_app(config_class="config.DevelopmentConfig"):
         doc='/api/v1/',
         authorizations=authorizations
     )
+
+    @app.before_request
+    def restrict_swagger_to_admin():
+        """Allow Swagger/API docs only to authenticated admins."""
+        path = request.path
+        swagger_paths = {
+            '/api/v1/',
+            '/api/v1',
+            '/swagger.json',
+            '/api/v1/swagger.json',
+        }
+
+        if path not in swagger_paths:
+            return None
+
+        try:
+            verify_jwt_in_request()
+            claims = get_jwt()
+            if claims.get('is_admin'):
+                return None
+        except JWTExtendedException:
+            pass
+
+        # Redirection demandee pour les non-admins
+        return redirect('/', code=302)
 
     from app.api.v1.users import api as users_ns
     from app.api.v1.amenities import api as amenities_ns

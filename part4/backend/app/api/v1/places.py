@@ -30,11 +30,21 @@ place_model = api.model('Place', {
     'title': fields.String(required=True, description='Title of the place'),
     'description': fields.String(description='Description of the place'),
     'price': fields.Float(required=True, description='Price per night'),
-    'latitude': fields.Float(required=True, description='Latitude of the place'),
-    'longitude': fields.Float(required=True, description='Longitude of the place'),
+    'latitude': fields.Float(
+        required=True,
+        description='Latitude of the place',
+    ),
+    'longitude': fields.Float(
+        required=True,
+        description='Longitude of the place',
+    ),
     'owner_id': fields.String(required=True, description='ID of the owner'),
     'owner': fields.Nested(user_model, description='Owner of the place'),
-    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
+    'amenities': fields.List(
+        fields.String,
+        required=True,
+        description="List of amenities ID's",
+    )
 })
 
 put_place_model = api.model('PUT_Place', {
@@ -55,8 +65,10 @@ class PlaceList(Resource):
         """Register a new place"""
         try:
             place_data = api.payload
-            current_user = get_jwt_identity()  # Get the current user's identity from the JWT token
-            place_data['owner_id'] = current_user  # Set the owner_id to the current user's ID
+            # Get the current user's identity from JWT token.
+            current_user = get_jwt_identity()
+            # Set owner_id to the current user's ID.
+            place_data['owner_id'] = current_user
 
             new_place = facade.create_place(place_data)
 
@@ -107,7 +119,6 @@ class PlaceResource(Resource):
             "price": place.price,
             "latitude": place.latitude,
             "longitude": place.longitude,
-            # TODO: Expected Responses is not the same about docs github
             "owner": {
                 "id": owner.id,
                 "first_name": owner.first_name,
@@ -126,9 +137,15 @@ class PlaceResource(Resource):
                     "id": review.id,
                     "text": review.text,
                     "rating": review.rating,
-                    "user_id": review.user_id
+                    "user_id": review.user_id,
+                    "user": {
+                        "id": review_user.id,
+                        "first_name": review_user.first_name,
+                        "last_name": review_user.last_name
+                    } if review_user else None
                 }
                 for review in place.reviews
+                for review_user in [facade.get_user(review.user_id)]
             ]
         }, 200
 
@@ -206,7 +223,13 @@ class PlaceReviewList(Resource):
                 "id": review.id,
                 "text": review.text,
                 "rating": review.rating,
-                "user_id": review.user_id
+                "user_id": review.user_id,
+                "user": {
+                    "id": review_user.id,
+                    "first_name": review_user.first_name,
+                    "last_name": review_user.last_name
+                } if review_user else None
             }
             for review in reviews
+            for review_user in [facade.get_user(review.user_id)]
         ], 200

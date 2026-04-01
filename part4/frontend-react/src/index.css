@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+@theme {
+    --color-background: #fffaf7;
+    --color-surface: #ffffff;
+    --color-text-main: #1f2937;
+    --color-text-body: #4b5563;
+    --color-primary: #ff5a5f;
+    --color-primary-dark: #e0484d;
+    --color-secondary: #0ea54d;
+    --color-secondary-dark: #0d8c42;
+    --color-accent: #ff5a5f;
+    --color-accent-dark: #e0484d;
+    --color-border: #f1d5d0;
+
+    --color-brand-50: #fff7f5;
+    --color-brand-100: #ffecea;
+    --color-brand-200: #ffd8d3;
+    --color-brand-300: #ffbdb6;
+    --color-brand-400: #ff9a90;
+    --color-brand-500: #ff7a6f;
+    --color-brand-600: #ff5a5f;
+    --color-brand-700: #e0484d;
+    --color-brand-800: #b63a3f;
+    --color-brand-900: #7a2a2e;
+    --color-brand-950: #4e1c1f;
+
+    --color-ink-black: #1f2937;
+    --color-deep-space-blue: #e0484d;
+    --color-blue-slate: #4b5563;
+    --color-dusty-denim: #ffd8d3;
+    --color-eggshell: #fffaf7;
+
+    --color-error: #dc2626;
+}
+
+@layer base {
+    :root {
+        --color-bg-primary: #fffaf7;
+        --color-bg-secondary: #fff1ee;
+        --color-bg-tertiary: #ffffff;
+        --color-text-primary: #1f2937;
+        --color-text-secondary: #4b5563;
+        --color-text-tertiary: #6b7280;
+        --color-accent: #ff5a5f;
+        --color-accent-dark: #e0484d;
+        --color-accent-light: #ff9a90;
+        --color-border: #f1d5d0;
+        --color-success: #4caf50;
+        --color-error: #f44336;
+        --color-info: #ff5a5f;
+        --color-warning: #0ea5a4;
+        
+        /* Spacing Scale */
+        --space-xs: 0.25rem;
+        --space-sm: 0.5rem;
+        --space-md: 1rem;
+        --space-lg: 1.5rem;
+        --space-xl: 2rem;
+        --space-2xl: 3rem;
+        --space-3xl: 4rem;
+        
+        /* Typography */
+        --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+        --font-size-xs: 0.75rem;
+        --font-size-sm: 0.875rem;
+        --font-size-base: 1rem;
+        --font-size-lg: 1.125rem;
+        --font-size-xl: 1.25rem;
+        --font-size-2xl: 1.5rem;
+        --font-size-3xl: 2rem;
+        --font-size-4xl: 2.5rem;
+    }
+    
+    * {
+        @apply box-border;
+    }
+    
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    body {
+        @apply bg-background text-text-main font-sans leading-relaxed;
+        font-family: var(--font-family);
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-bold text-text-main leading-tight;
+    }
+    
+    h1 {
+        @apply text-4xl md:text-5xl;
+    }
+    
+    h2 {
+        @apply text-3xl md:text-4xl;
+    }
+    
+    h3 {
+        @apply text-2xl md:text-3xl;
+    }
+    
+    .skip-to-content {
+        @apply absolute top-0 left-0 z-50 px-3 py-2 bg-primary text-white rounded-b-md focus:outline-none focus:ring-2 focus:ring-accent -translate-y-full focus:translate-y-0 transition-transform;
+    }
+}
+
+@layer components {
+    /* Buttons */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold text-base rounded-full transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+    
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold text-base rounded-full transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-primary text-white hover:bg-primary-dark focus:ring-accent;
+    }
+    
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold text-base rounded-full transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-secondary text-white hover:bg-secondary-dark focus:ring-accent border border-secondary;
+    }
+    
+    .btn-outline {
+        @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold text-base rounded-full transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-accent;
+    }
+    
+    .btn-sm {
+        @apply px-4 py-2 text-sm;
+    }
+    
+    /* Input Fields */
+    .input {
+        @apply w-full px-4 py-3 bg-white text-text-main border border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all;
+    }
+    
+    .input::placeholder {
+        @apply text-gray-400;
+    }
+    
+    /* Cards */
+    .card {
+        @apply bg-surface border border-border rounded-3xl shadow-sm hover:shadow-md transition-shadow overflow-hidden;
+    }
+
+    .badge {
+        @apply inline-flex items-center rounded-full border border-brand-300 bg-white px-3 py-1 text-xs font-semibold tracking-wide text-brand-800;
+    }
+
+    .icon-badge {
+        @apply flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-100 text-brand-700;
+    }
+    
+    /* Containers */
+    .container-max {
+        @apply max-w-6xl mx-auto px-6;
+    }
+    
+    .section {
+        @apply py-12 md:py-16 lg:py-20;
+    }
+}
